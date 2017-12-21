@@ -1,0 +1,18 @@
+Task1:
+
+sqlContext.sql("SELECT revenue_by_route_per_year.year_of_travel, revenue_by_route_per_year.src, revenue_by_route_per_year.dest, revenue_by_route_per_year.total_revenue FROM (SELECT trav.year_of_travel, trav.src, trav.dest, sum(trans.cost_per_unit) AS total_revenue FROM Travel trav JOIN Transport trans  ON trav.travel_mode= trans.travel_mode GROUP BY trav.year_of_travel, trav.src, trav.dest) revenue_by_route_per_year, (SELECT year_of_travel, max(total_revenue) AS total_revenue FROM (SELECT trav.year_of_travel, trav.src, trav.dest, sum(trans.cost_per_unit) AS total_revenue FROM Travel trav JOIN Transport trans  ON trav.travel_mode= trans.travel_mode GROUP BY trav.year_of_travel, trav.src, trav.dest) travel_revenue_per_year2 GROUP BY year_of_travel) max_revenue_per_year WHERE revenue_by_route_per_year.year_of_travel = max_revenue_per_year.year_of_travel AND revenue_by_route_per_year.total_revenue=max_revenue_per_year.total_revenue ORDER BY revenue_by_route_per_year.year_of_travel").show()
+
+
+Task2:
+sqlContext.sql("SELECT us.user_id, us.name, trav.year_of_travel, sum(trans.cost_per_unit) AS total_amount_spent FROM Travel trav JOIN    Transport trans  ON trav.travel_mode= trans.travel_mode JOIN user us ON trav.user_id=us.user_id WHERE trav.travel_mode= 'airplane' GROUP BY us.user_id, us.name, trav.year_of_travel ORDER BY us.user_id").show()
+
+
+Task3:
+
+sqlContext.sql("SELECT DISTINCT just_travel_count.year_of_travel, just_travel_count.age_group FROM (SELECT age_group_count.year_of_travel,age_group_count.age_group, COUNT(*) AS travel_count FROM (SELECT trav.year_of_travel,CASE WHEN us.age < 20 THEN '< 20' WHEN age >= 20 AND age <= 35 THEN '20-35'  WHEN age >35 THEN '> 35' END AS age_group FROM Travel trav JOIN User us ON  trav.user_id=us.user_id) age_group_count GROUP BY age_group_count.year_of_travel, age_group_count.age_group) just_travel_count, (SELECT year_agegroup_travel_count.year_of_travel, max(year_agegroup_travel_count.travel_count) AS  travel_count FROM (SELECT age_group_count.year_of_travel AS year_of_travel,age_group_count.age_group, COUNT(*) travel_count FROM (SELECT trav.year_of_travel,CASE WHEN us.age < 20 THEN '< 20' WHEN age >= 20 AND age <= 35 THEN '20-35'  WHEN age >35 THEN '> 35' END AS age_group FROM Travel trav JOIN User us ON  trav.user_id=us.user_id) age_group_count GROUP BY age_group_count.year_of_travel, age_group_count.age_group) year_agegroup_travel_count GROUP BY year_agegroup_travel_count.year_of_travel) max_travel_count WHERE just_travel_count.year_of_travel = max_travel_count.year_of_travel AND just_travel_count.travel_count = max_travel_count.travel_count ORDER BY just_travel_count.year_of_travel").show()
+
+
+
+
+
+
